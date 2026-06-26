@@ -1,0 +1,188 @@
+/*
+ * Design tokens — change the palette here in ONE place.
+ * Light theme is the default; [data-theme="dark"] overrides the same names.
+ * Components below reference only these variables, never raw colors.
+ */
+:root {
+  --bg: #f4f5fb;
+  --surface: #ffffff;
+  --surface-2: #eceef7;
+  --border: #d9dcec;
+  --text: #1b1e2b;
+  --text-muted: #5d6379;
+  --accent: #6c5ce7;
+  --accent-hover: #5a4bd4;
+  --accent-contrast: #ffffff;
+  --success: #16a34a;
+  --danger: #dc2626;
+  /* Guess indicators */
+  --guess-correct: #16a34a; /* green */
+  --guess-franchise: #eab308; /* yellow — wrong but same franchise */
+  --guess-wrong: #dc2626; /* red — wrong */
+  --shadow: 0 8px 30px rgba(20, 22, 40, 0.08);
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+[data-theme="dark"] {
+  --bg: #0e1016;
+  --surface: #171a24;
+  --surface-2: #222634;
+  --border: #2c3142;
+  --text: #e9ebf5;
+  --text-muted: #99a0b8;
+  --accent: #8b7cf0;
+  --accent-hover: #9d90f4;
+  --accent-contrast: #0e1016;
+  --success: #34d399;
+  --danger: #f87171;
+  --guess-correct: #34d399;
+  --guess-franchise: #facc15;
+  --guess-wrong: #f87171;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.app { width: min(620px, 100%); margin: 0 auto; padding: 24px 16px 64px; }
+
+/* Header */
+.header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.title { font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+.subtitle { color: var(--text-muted); margin: 0 0 20px; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+/* Controls */
+.icon-btn, .select {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.icon-btn:hover, .select:hover { border-color: var(--accent); }
+.select { padding-right: 8px; }
+
+.btn {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn:hover { background: var(--accent-hover); }
+.btn.ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+.btn.ghost:hover { color: var(--text); border-color: var(--accent); }
+
+.input {
+  width: 100%;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font: inherit;
+}
+.input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+
+audio { width: 100%; margin: 4px 0; }
+
+.meta-row { color: var(--text-muted); font-size: 0.85rem; margin: 8px 0 0; }
+
+/* Guess history */
+.guesses { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 6px; }
+.guess {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+.guess .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.guess .guess-label { flex: 1; }
+.guess .tag { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.guess.green { border-left-color: var(--guess-correct); }
+.guess.green .dot { background: var(--guess-correct); }
+.guess.yellow { border-left-color: var(--guess-franchise); }
+.guess.yellow .dot { background: var(--guess-franchise); }
+.guess.red { border-left-color: var(--guess-wrong); }
+.guess.red .dot { background: var(--guess-wrong); }
+
+/* Hints */
+.hints { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
+.hint {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+.hint .kind { color: var(--accent); font-weight: 700; text-transform: capitalize; }
+
+/* Autocomplete */
+.autocomplete { position: relative; margin-top: 16px; }
+.options { list-style: none; margin: 6px 0 0; padding: 6px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); display: grid; gap: 2px; }
+.option { width: 100%; text-align: left; background: transparent; color: var(--text); border: none; border-radius: 7px; padding: 9px 10px; cursor: pointer; font: inherit; }
+.option:hover { background: var(--surface-2); }
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+
+/* End card */
+.end-banner { font-size: 1.15rem; font-weight: 800; margin: 0 0 4px; }
+.end-banner.win { color: var(--success); }
+.end-banner.lose { color: var(--danger); }
+.answer-name { font-size: 1.3rem; font-weight: 800; margin: 12px 0 2px; }
+.answer-facts { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 16px; }
+
+.covers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cover { display: flex; flex-direction: column; gap: 6px; }
+.cover-label { font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.cover-frame {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.cover-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Classic "no image" placeholder */
+.no-image {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; color: var(--text-muted);
+  background:
+    repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 10px, var(--border) 10px, var(--border) 11px);
+}
+.no-image .glyph { font-size: 1.8rem; opacity: 0.6; }
+.no-image .label { font-size: 0.75rem; }
+
+.center { text-align: center; color: var(--text-muted); padding: 24px; }
+.error { color: var(--danger); }
