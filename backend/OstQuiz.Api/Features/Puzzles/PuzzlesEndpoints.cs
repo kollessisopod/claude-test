@@ -9,9 +9,9 @@ public static class PuzzlesEndpoints
     {
         var grp = app.MapGroup("/api/puzzles").WithTags("Puzzles");
 
-        // Archive: every playable date (today or earlier), newest first.
-        grp.MapGet("", async (PuzzleService svc, CancellationToken ct) =>
-            Results.Ok(await svc.GetAvailableDatesAsync(ct)));
+        // Archive: a page of playable dates (today or earlier), newest first.
+        grp.MapGet("", async (int? skip, int? take, PuzzleService svc, CancellationToken ct) =>
+            Results.Ok(await svc.GetArchiveAsync(skip ?? 0, take ?? 20, ct)));
 
         // A specific day's puzzle metadata + an initial progression token. No answer/hints leaked.
         grp.MapGet("/{date}", async (DateOnly date, PuzzleService svc, CancellationToken ct) =>

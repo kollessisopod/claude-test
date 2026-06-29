@@ -6,9 +6,11 @@ it's from. You get **6 guesses**; each failed/skipped guess unlocks more audio
 **genre → release date → metacritic score → publisher → developer**.
 
 Play is anonymous — the daily puzzle is the same for everyone and your progress lives in
-your browser's `localStorage` (no accounts, no tracking). You can also **play previous days**
-from the archive, and toggle a **light/dark theme**. When a round ends, the game reveals the
-answer along with its **game cover** and **album cover** (or a "no image" placeholder if none).
+your browser's `localStorage` (no accounts, no tracking). A separate **Previous days** page lists
+the archive (paginated, 20 at a time with a "Load more days" button); each day shows your result
+as colored boxes (one per attempt, gray for unplayed). Toggle a **light/dark theme** any time.
+When a round ends — won, failed, or skipped out — the game plays the **full track** and reveals
+the answer with its **game cover** and **album cover** (or a "no image" placeholder if none).
 
 Each guess is listed with a colored indicator:
 
@@ -82,12 +84,12 @@ Public:
 - `GET  /health`
 - `GET  /api/games?search=&limit=` — autocomplete pool (`id`, `name` only)
 - `GET  /api/games/{id}/cover` — game cover image (404 if none)
-- `GET  /api/puzzles` — archive: playable dates, newest first (`[{ date, isToday }]`)
+- `GET  /api/puzzles?skip=0&take=20` — archive page, newest first (`{ items: [{ date, isToday }], total }`)
 - `GET  /api/puzzles/{date}` — puzzle metadata + initial progression token (no answer/hints)
 - `GET  /api/puzzles/{date}/audio?step=0..5&token=` — audio clip for a token-unlocked step
 - `GET  /api/puzzles/{date}/hint?step=1..5&token=` — the hint unlocked at a step
 - `GET  /api/puzzles/{date}/album-cover` — album cover image (404 if none)
-- `POST /api/puzzles/{date}/guess` — `{ token, guessGameId }` → `{ correct, gameOver, revealedHint?, answer?, nextToken? }`
+- `POST /api/puzzles/{date}/guess` — `{ token, guessGameId }` → `{ correct, gameOver, revealedHint?, answer?, nextToken?, guessedGameName?, franchiseMatch, fullAudioToken? }` (`fullAudioToken` unlocks the whole track at game over)
 
 Admin (require header `X-Admin-Key: <ADMIN_KEY>`):
 - `POST /api/admin/games/import` — `{ count }` pull top-N games from RAWG

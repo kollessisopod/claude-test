@@ -32,16 +32,27 @@ public class PuzzleService(AppDbContext db, RawgImportService enricher, StepToke
             .FirstOrDefaultAsync(p => p.PuzzleDate == day, ct);
     }
 
-    /// <summary>Dates that have a playable puzzle (today or earlier), newest first.</summary>
-    public async Task<List<PuzzleDateInfo>> GetAvailableDatesAsync(CancellationToken ct = default)
+    /// <summary>
+    /// A page of playable dates (today or earlier), newest first. Paginated so the archive
+    /// scales to thousands of days without pulling them all at once.
+    /// </summary>
+    public async Task<ArchivePage> GetArchiveAsync(int skip, int take, CancellationToken ct = default)
     {
         var today = Today;
-        var dates = await db.Puzzles
-            .Where(p => p.PuzzleDate <= today)
+        skip = Math.Max(0, skip);
+        take = Math.Clamp(take, 1, 100);
+
+        var baseQuery = db.Puzzles.Where(p => p.PuzzleDate <= today);
+        var total = await baseQuery.CountAsync(ct);
+        var dates = await baseQuery
             .OrderByDescending(p => p.PuzzleDate)
+            .Skip(skip)
+            .Take(take)
             .Select(p => p.PuzzleDate)
             .ToListAsync(ct);
-        return dates.Select(d => new PuzzleDateInfo(d, d == today)).ToList();
+
+        var items = dates.Select(d => new PuzzleDateInfo(d, d == today)).ToList();
+        return new ArchivePage(items, total);
     }
 
     /// <summary>Issues a fresh progression token for the given step of this puzzle.</summary>
@@ -137,6 +148,8 @@ public class PuzzleService(AppDbContext db, RawgImportService enricher, StepToke
         }
 
         var answer = gameOver ? ToAnswer(p) : null;
-        return new GuessResponse(correct, gameOver, revealed, answer, nextToken, guessed?.Name, franchiseMatch);
+        // On game over, hand out a token unlocking the full audio so the player hears the whole track.
+        var fullAudioToken = gameOver ? IssueToken(p, lastStep) : null;
+        return new GuessResponse(correct, gameOver, revealed, answer, nextToken, guessed?.Name, franchiseMatch, fullAudioToken);
     }
 }

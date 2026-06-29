@@ -51,20 +51,32 @@ public static class DbSeeder
             logger.LogInformation("Seeded {Count} games", SeedGames.Length);
         }
 
+        // Seed the last 5 days so there's an archive to browse and replay.
+        // Today's answer (DOOM) has a franchise sibling (DOOM Eternal) to demo the franchise indicator.
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        if (!await db.Puzzles.AnyAsync(p => p.PuzzleDate == today, ct))
+        (int Offset, string Game, double Freq)[] plan =
         {
-            // Answer has a franchise sibling (DOOM Eternal) so the franchise indicator is demoable.
-            var answer = await db.Games.FirstAsync(g => g.Name == "DOOM", ct);
-            var audioKey = $"puzzles/{today:yyyy-MM-dd}/full.wav";
+            (0, "DOOM", 440),
+            (1, "The Witcher 3: Wild Hunt", 392),
+            (2, "Hollow Knight", 523),
+            (3, "Celeste", 349),
+            (4, "Stardew Valley", 294),
+        };
 
-            var wav = SampleAudio.GenerateTone(durationSeconds: 12, frequencyHz: 440);
+        foreach (var item in plan)
+        {
+            var date = today.AddDays(-item.Offset);
+            if (await db.Puzzles.AnyAsync(p => p.PuzzleDate == date, ct)) continue;
+
+            var answer = await db.Games.FirstAsync(g => g.Name == item.Game, ct);
+            var audioKey = $"puzzles/{date:yyyy-MM-dd}/full.wav";
+            var wav = SampleAudio.GenerateTone(durationSeconds: 12, frequencyHz: item.Freq);
             using (var ms = new MemoryStream(wav))
                 await storage.PutAudioAsync(audioKey, ms, "audio/wav", ct);
 
             var puzzle = new Puzzle
             {
-                PuzzleDate = today,
+                PuzzleDate = date,
                 GameId = answer.Id,
                 AudioKey = audioKey,
                 CreatedAt = DateTimeOffset.UtcNow,
@@ -72,9 +84,9 @@ public static class DbSeeder
             db.Puzzles.Add(puzzle);
             await db.SaveChangesAsync(ct);
 
-            // Generate per-step clips for the seeded puzzle (no-op if ffmpeg is unavailable).
+            // Generate per-step clips (no-op if ffmpeg is unavailable).
             await clipSvc.GenerateForPuzzleAsync(puzzle, wav, ".wav", "audio/wav", ct);
-            logger.LogInformation("Seeded today's puzzle ({Date}) -> {Game}", today, answer.Name);
+            logger.LogInformation("Seeded puzzle ({Date}) -> {Game}", date, answer.Name);
         }
     }
 }

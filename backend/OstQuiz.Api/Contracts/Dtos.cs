@@ -16,6 +16,8 @@ public record GuessRequest(string Token, int GuessGameId);
 
 public record PuzzleDateInfo(DateOnly Date, bool IsToday);
 
+public record ArchivePage(IReadOnlyList<PuzzleDateInfo> Items, int Total);
+
 public record AnswerDto(
     int GameId,
     string Name,
@@ -34,7 +36,8 @@ public record GuessResponse(
     AnswerDto? Answer,
     string? NextToken,
     string? GuessedGameName,
-    bool FranchiseMatch);
+    bool FranchiseMatch,
+    string? FullAudioToken);
 
 // Admin
 public record ImportRequest(int? Count);

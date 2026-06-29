@@ -186,3 +186,29 @@ audio { width: 100%; margin: 4px 0; }
 
 .center { text-align: center; color: var(--text-muted); padding: 24px; }
 .error { color: var(--danger); }
+
+/* Archive page */
+.archive-list { list-style: none; padding: 0; margin: 0 0 16px; display: grid; gap: 8px; }
+.archive-item {
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.05s ease;
+}
+.archive-item:hover { border-color: var(--accent); }
+.archive-item:active { transform: scale(0.995); }
+.archive-date { font-weight: 600; }
+
+.boxes { display: inline-flex; gap: 5px; }
+.box { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--border); }
+.box.empty { background: var(--surface-2); }
+.box.green { background: var(--guess-correct); border-color: var(--guess-correct); }
+.box.yellow { background: var(--guess-franchise); border-color: var(--guess-franchise); }
+.box.red { background: var(--guess-wrong); border-color: var(--guess-wrong); }
